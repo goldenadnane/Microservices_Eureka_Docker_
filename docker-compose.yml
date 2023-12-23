@@ -1,0 +1,58 @@
+version: '3'
+
+services:
+  eureka-server:
+    image: openjdk:17-jdk-alpine
+    ports:
+      - "8762:8761"
+    working_dir: /app
+    volumes:
+      - ./TP-Microservices/EurekaServer/target:/app
+    networks:
+      - eureka-net
+
+  eureka-client:
+    image: openjdk:17-jdk-alpine
+    ports:
+      - "8080:8080"
+    working_dir: /app
+    volumes:
+      - ./TP-Microservices/Client/target:/app
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_SERVER=http://eureka-server:8761/eureka
+    networks:
+      - eureka-net
+
+  eureka-client2:
+    image: openjdk:17-jdk-alpine
+    ports:
+      - "8089:8080"
+    working_dir: /app
+    volumes:
+      - ./TP-Microservices/Client2/target:/app
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_SERVER=http://eureka-server:8761/eureka
+    networks:
+      - eureka-net
+
+  gateway:
+    image: openjdk:17-jdk-alpine
+    ports:
+      - "8889:8888"
+    working_dir: /app
+    volumes:
+      - ./TP-Microservices/Gateway/target:/app
+    depends_on:
+      - eureka-server
+    environment:
+      - EUREKA_SERVER=http://eureka-server:8761/eureka
+    networks:
+      - eureka-net
+
+networks:
+  eureka-net:
+    driver: bridge
